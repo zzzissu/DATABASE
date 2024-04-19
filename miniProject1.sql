@@ -3,19 +3,12 @@
 
 CREATE TABLE cart
 (
-  cart_no   VARCHAR2(20) NOT NULL,
+  cart_no   VARCHAR2(20) NOT NULL unique,
   cart_qty  NUMBER       NOT NULL,
   cart_date DATE         NOT NULL,
-  prod_code VARCHAR2(20) NOT NULL,
-  CONSTRAINT PK_cart PRIMARY KEY (cart_no)
+  prod_name VARCHAR2(20) NOT NULL,
+  cart_price VARCHAR2(20) NOT NULL
 );
-
-COMMENT ON TABLE cart IS '주문내역';
-COMMENT ON COLUMN cart.cart_no IS '주문번호';
-COMMENT ON COLUMN cart.cart_qty IS '수량';
-COMMENT ON COLUMN cart.cart_date IS '주문일자';
-COMMENT ON COLUMN cart.prod_code IS '상품코드';
-
 
 CREATE TABLE lprod
 (
@@ -24,27 +17,15 @@ CREATE TABLE lprod
   CONSTRAINT PK_lprod PRIMARY KEY (lprod_code)
 );
 
-COMMENT ON TABLE lprod IS '상품분류';
-COMMENT ON COLUMN lprod.lprod_code IS '상품분류코드';
-COMMENT ON COLUMN lprod.lprod_name IS '분류명';
 
-
-CREATE TABLE member_job
+CREATE TABLE employee_mem
 (
   mem_name     VARCHAR2(20) NOT NULL,
-  mem_add      VARCHAR2(20) NOT NULL,
   mem_hiredate DATE         NOT NULL,
   mem_position VARCHAR2(20) NOT NULL,
-  mem_code     VARCHAR2(20) NOT NULL,
-  CONSTRAINT PK_member_job PRIMARY KEY (mem_code)
+  mem_num     VARCHAR2(20) NOT NULL,
+  CONSTRAINT PK_employee_mem PRIMARY KEY (mem_num)
 );
-
-COMMENT ON TABLE member_job IS '직원관리';
-COMMENT ON COLUMN member_job.mem_name IS '이름';
-COMMENT ON COLUMN member_job.mem_add IS '주소';
-COMMENT ON COLUMN member_job.mem_hiredate IS '입사일';
-COMMENT ON COLUMN member_job.mem_position IS '직급';
-COMMENT ON COLUMN member_job.mem_code IS '직원코드';
 
 
 CREATE TABLE prod
@@ -54,31 +35,28 @@ CREATE TABLE prod
   prod_price NUMBER       NOT NULL,
   prod_qty   NUMBER       NOT NULL,
   lprod_code VARCHAR2(20) NOT NULL,
-  CONSTRAINT PK_prod PRIMARY KEY (prod_code)
+  CONSTRAINT PK_prod PRIMARY KEY (prod_name)
 );
 
-COMMENT ON TABLE prod IS '상품정보';
-COMMENT ON COLUMN prod.prod_code IS '상품코드';
-COMMENT ON COLUMN prod.prod_name IS '상품명';
-COMMENT ON COLUMN prod.prod_price IS '가격';
-COMMENT ON COLUMN prod.prod_qty IS '재고수량';
-COMMENT ON COLUMN prod.lprod_code IS '상품분류코드';
-
-
 ALTER TABLE cart
-  ADD CONSTRAINT FK_prod_TO_cart
-    FOREIGN KEY (prod_code)
-    REFERENCES prod (prod_code);
+  ADD CONSTRAINT FK_prod_TO_cart         -- 제약조건 걸어주기
+    FOREIGN KEY (prod_name)
+    REFERENCES prod (prod_name);         -- 참조(cart 에 있는 데이터를 참조)
 
 ALTER TABLE prod
   ADD CONSTRAINT FK_lprod_TO_prod
     FOREIGN KEY (lprod_code)
     REFERENCES lprod (lprod_code);
+   
+CREATE TABLE TOTALSALES
+(
+  TO_PRICE NUMBER   NULL
+);
 
         
 
 ----------------- 상품 데이터 입력
-SELECT * FROM lprod;
+SELECT * FROM prod;
 
 INSERT INTO lprod VALUES ('b01', '빵류');
 INSERT INTO lprod VALUES ('c01', '케이크류');
@@ -96,15 +74,16 @@ INSERT INTO prod VALUES ('a009', '초코 쿠키', 3500, 300, 'c02');
 INSERT INTO prod VALUES ('a010', '버터 쿠키', 3000, 300, 'c02');
 
 ----------------- 직원 데이터 입력
-ALTER TABLE ADAM.MEMBER_JOB MODIFY MEM_ADD VARCHAR2(50);
 
-SELECT * FROM member_job;
+SELECT * FROM EMPLOYEE_MEM;
+SELECT * FROM PROD;
+SELECT * FROM TOTALSALES;
+SELECT * FROM CART;
 
-INSERT INTO member_job VALUES ('한지수', '부산시 남구', to_date('23-02-2020', 'dd-mm-yyyy'), 'Manager', 'M-200223-01');
-INSERT INTO member_job VALUES ('이윤지', '부산시 북구', to_date('30-04-2019', 'dd-mm-yyyy'), 'Manager', 'M-190430-01');
-INSERT INTO member_job VALUES ('이은지', '부산시 부산진구', to_date('25-03-2020', 'dd-mm-yyyy'), 'Staff', 'S-200325-01');
-INSERT INTO member_job VALUES ('강소이', '부산시 영도구', to_date('05-06-2022', 'dd-mm-yyyy'), 'Staff', 'S-220605-01');
-INSERT INTO member_job VALUES ('한성지', '부산시 해운대구', to_date('01-05-2023', 'dd-mm-yyyy'), 'Intern', 'I-230501-01');
-INSERT INTO member_job VALUES ('강정미', '부산시 수영구', to_date('16-10-2021', 'dd-mm-yyyy'), 'Staff', 'S-211016-01');
-
+INSERT INTO employee_mem VALUES ('한지수', to_date('23-02-2020', 'dd-mm-yyyy'), 'Manager', '2002-2301');
+INSERT INTO employee_mem VALUES ('이윤지', to_date('30-04-2019', 'dd-mm-yyyy'), 'Manager', '1904-3001');
+INSERT INTO employee_mem VALUES ('이은지', to_date('25-03-2020', 'dd-mm-yyyy'), 'Staff', '2003-2501');
+INSERT INTO employee_mem VALUES ('강소이', to_date('05-06-2022', 'dd-mm-yyyy'), 'Staff', '2206-0501');
+INSERT INTO employee_mem VALUES ('한성지', to_date('01-05-2023', 'dd-mm-yyyy'), 'Intern', '2305-0101');
+INSERT INTO employee_mem VALUES ('강정미', to_date('16-10-2021', 'dd-mm-yyyy'), 'Staff', '2110-1601');
 
